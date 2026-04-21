@@ -17,7 +17,9 @@ if(!isset($_SESSION['user'])) {
     <p>Email: <?php echo $user['email']; ?></p>
     <a href="index.php">View Students</a><br><br>
     <a href="add_student.php">Add Student</a><br><br>
-    <a href="logout.php" class="logout-button">Logout</a>
+    <a href="logout.php" class="logout-button">Logout</a><br><br>
+    <a href="add_marks.php">Add Marks</a><br><br>
+    <a href="add_attendence.php">Add Attendance</a><br><br>
     <h3>All Students</h3>
     <table border="1">
         <tr>
