@@ -1,148 +1,161 @@
 <?php
 session_start();
 include "config.php";
+
+// 🔐 Check login FIRST
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
+
 $email = $_SESSION['user'];
-$query = "SELECT * FROM students WHERE email='$email'";
-$result = mysqli_query($conn, $query);
+
+// Get user details safely
+$stmt = mysqli_prepare($conn, "SELECT * FROM students WHERE email=?");
+mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
+
+// Prepare chart data
 $marks = [];
 $attendance = [];
 
-$query = "SELECT m.marks, a.percentage FROM marks m JOIN attendance a ON m.student_id = a.student_id WHERE m.student_id = '{$user['id']}'";
-$result = mysqli_query($conn, $query);
+$stmt = mysqli_prepare($conn, "SELECT m.marks, a.percentage 
+    FROM marks m 
+    JOIN attendance a ON m.student_id = a.student_id 
+    WHERE m.student_id = ?");
+mysqli_stmt_bind_param($stmt, "i", $user['id']);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
 while ($row = mysqli_fetch_assoc($result)) {
     $marks[] = $row['marks'];
     $attendance[] = $row['percentage'];
 }
-
-if(!isset($_SESSION['user'])) {
-    header("Location: login.php");
-    exit();
-}
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <div class="container">
-    <h2>Welcome, <?php echo $user['name']; ?>!</h2>
-    <p>Email: <?php echo $user['email']; ?></p>
-    <a href="index.php">View Students</a><br><br>
-    <a href="add_student.php">Add Student</a><br><br>
-    <a href="logout.php" class="logout-button">Logout</a><br><br>
-    <a href="add_marks.php">Add Marks</a><br><br>
-    <a href="add_attendence.php">Add Attendance</a><br><br>
-    <h3>All Students</h3>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-        </tr>
-        <?php
-        $query = "SELECT * FROM students";
-        $result = mysqli_query($conn, $query);
-        while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $row['id'] . "</td>";
-                echo "<td>" . $row['name'] . "</td>";
-                echo "<td>" . $row['email'] . "</td>";
-                echo "</tr>";
-        }
-        ?>
+<div class="container">
+
+    <h2>Welcome, <?php echo htmlspecialchars($user['name']); ?> 👋</h2>
+    <p>Email: <?php echo htmlspecialchars($user['email']); ?></p>
+
+    <div class="nav-links">
+        <a href="index.php">Students</a>
+        <a href="add_student.php">Add Student</a>
+        <a href="add_marks.php">Add Marks</a>
+        <a href="add_attendance.php">Add Attendance</a>
+        <a href="logout.php" class="logout-button">Logout</a>
     </div>
-    <h3>Student Marks</h3>
+    
+    <!-- Students -->
+    <div class="card">
+        <h3>All Students</h3>
         <table>
-            <tr>
-                <th>Student ID</th>
-                <th>Subject ID</th>
-                <th>Marks</th>
-            </tr>
+            <tr><th>ID</th><th>Name</th><th>Email</th></tr>
             <?php
-            $query = "SELECT * FROM marks";
-            $result = mysqli_query($conn, $query);
+            $result = mysqli_query($conn, "SELECT * FROM students");
             while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $row['student_id'] . "</td>";
-                echo "<td>" . $row['subject_id'] . "</td>";
-                echo "<td>" . $row['marks'] . "</td>";
-                echo "</tr>";
+                echo "<tr>
+                        <td>{$row['id']}</td>
+                        <td>" . htmlspecialchars($row['name']) . "</td>
+                        <td>" . htmlspecialchars($row['email']) . "</td>
+                      </tr>";
             }
             ?>
         </table>
-        <h3>Attendance Records</h3>
+    </div>
+
+    <!-- Marks -->
+    <div class="card">
+        <h3>Marks</h3>
         <table>
-            <tr>
-                <th>Student ID</th>
-                <th>Attendance (%)</th>
-            </tr>
+            <tr><th>Student ID</th><th>Subject ID</th><th>Marks</th></tr>
             <?php
-            $query = "SELECT * FROM attendance";
-            $result = mysqli_query($conn, $query);
+            $result = mysqli_query($conn, "SELECT * FROM marks");
             while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $row['student_id'] . "</td>";
-                echo "<td>" . $row['percentage'] . "</td>";
-                echo "</tr>";
+                echo "<tr>
+                        <td>{$row['student_id']}</td>
+                        <td>{$row['subject_id']}</td>
+                        <td>{$row['marks']}</td>
+                      </tr>";
             }
             ?>
         </table>
-        <h3>Student Performance Overview</h3>
+    </div>
+
+    <!-- Attendance -->
+    <div class="card">
+        <h3>Attendance</h3>
         <table>
-            <tr>
-                <th>Name</th>
-                <th>Marks</th>
-                <th>Attendance (%)</th>
-            </tr>
+            <tr><th>Student ID</th><th>Attendance (%)</th></tr>
             <?php
-            $query = "SELECT s.name, m.marks, a.percentage FROM students s
+            $result = mysqli_query($conn, "SELECT * FROM attendance");
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo "<tr>
+                        <td>{$row['student_id']}</td>
+                        <td>{$row['percentage']}</td>
+                      </tr>";
+            }
+            ?>
+        </table>
+    </div>
+
+    <!-- Performance -->
+    <div class="card">
+        <h3>Performance Overview</h3>
+        <table>
+            <tr><th>Name</th><th>Marks</th><th>Attendance</th></tr>
+            <?php
+            $query = "SELECT s.name, m.marks, a.percentage 
+                      FROM students s
                       JOIN marks m ON s.id = m.student_id
                       JOIN attendance a ON s.id = a.student_id";
             $result = mysqli_query($conn, $query);
+
             while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $row['name'] . "</td>";
-                echo "<td>" . $row['marks'] . "</td>";
-                echo "<td>" . $row['percentage'] . "</td>";
-                echo "</tr>";
+                echo "<tr>
+                        <td>" . htmlspecialchars($row['name']) . "</td>
+                        <td>{$row['marks']}</td>
+                        <td>{$row['percentage']}</td>
+                      </tr>";
             }
             ?>
         </table>
-        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
         <h3>Performance Graph</h3>
         <canvas id="myChart"></canvas>
-         <script>
-            const marks = <?php echo json_encode($marks); ?>;
-            const attendance = <?php echo json_encode($attendance); ?>;
-            const ctx = document.getElementById('myChart');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: marks.map((_, i) => "Student " + (i + 1)),
-                    datasets: [
-                        {
-                            label: 'Marks',
-                            data: marks,
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Attendance (%)',
-                            data: attendance,
-                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                }
-            });
-        </script>
+    </div>
+
+</div>
+
+<script>
+const marks = <?php echo json_encode($marks); ?>;
+const attendance = <?php echo json_encode($attendance); ?>;
+
+new Chart(document.getElementById('myChart'), {
+    type: 'bar',
+    data: {
+        labels: marks.map((_, i) => "Record " + (i + 1)),
+        datasets: [
+            { label: 'Marks', data: marks },
+            { label: 'Attendance (%)', data: attendance }
+        ]
+    }
+});
+</script>
+
 </body>
 </html>

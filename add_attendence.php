@@ -1,25 +1,58 @@
 <?php
 include "config.php";
 
-if(isset($_POST['submit'])) {
-    $student_id = $_POST['student_id'];
-    $percentage = $_POST['percentage'];
+$error = "";
+$success = "";
 
-    $query = "INSERT INTO attendance (student_id, percentage) VALUES ('$student_id', '$percentage')";
-    if (mysqli_query($conn, $query)) {
-        echo "Attendance added successfully.";
+if (isset($_POST['submit'])) {
+
+    $student_id = intval($_POST['student_id']);
+    $percentage = floatval($_POST['percentage']);
+
+    // Validation
+    if ($student_id <= 0) {
+        $error = "Invalid student ID!";
+    } elseif ($percentage < 0 || $percentage > 100) {
+        $error = "Attendance must be between 0 and 100!";
     } else {
-        echo "Error: " . mysqli_error($conn);
+
+        // Check if student exists
+        $stmt = mysqli_prepare($conn, "SELECT id FROM students WHERE id=?");
+        mysqli_stmt_bind_param($stmt, "i", $student_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_store_result($stmt);
+
+        if (mysqli_stmt_num_rows($stmt) == 0) {
+            $error = "Student does not exist!";
+        } else {
+
+            // Insert attendance
+            $stmt = mysqli_prepare($conn, "INSERT INTO attendance (student_id, percentage) VALUES (?, ?)");
+            mysqli_stmt_bind_param($stmt, "id", $student_id, $percentage);
+
+            if (mysqli_stmt_execute($stmt)) {
+                $success = "Attendance added successfully!";
+            } else {
+                $error = "Failed to add attendance!";
+            }
+        }
     }
 }
 ?>
+
 <link rel="stylesheet" href="style.css">
+
 <div class="container">
     <h2>Add Attendance</h2>
-    <form method="POST" action="">
-        Student ID: <input type="number" name="student_id" required><br><br>
-        Attendance (%): <input type="number" name="percentage" required><br><br>
-        <input type="submit" name="submit" value="Add Attendance">
+
+    <?php if ($error) echo "<p class='error'>$error</p>"; ?>
+    <?php if ($success) echo "<p class='success'>$success</p>"; ?>
+
+    <form method="POST">
+        <input type="number" name="student_id" placeholder="Student ID" required><br><br>
+        <input type="number" name="percentage" placeholder="Attendance (%)" min="0" max="100" step="0.1" required><br><br>
+        <button type="submit" name="submit">Add Attendance</button>
     </form>
-    <br><a href="dashboard.php">Back to Dashboard</a>
+
+    <br><a href="dashboard.php">← Back to Dashboard</a>
 </div>
