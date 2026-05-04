@@ -71,6 +71,7 @@ button:hover {
     border-radius: 12px;
     width: 90%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
 }
 
 /* 📋 Tables */
@@ -92,7 +93,7 @@ th, td {
 }
 
 tr:hover {
-    background-color: #f5f5f5;
+    background-color: #f2f2f2;
 }
 
 /* ✅ Messages */
@@ -102,6 +103,7 @@ tr:hover {
     padding: 10px;
     border-radius: 6px;
     text-align: center;
+    font-weight: bold;
 }
 
 .error {
@@ -110,6 +112,7 @@ tr:hover {
     padding: 10px;
     border-radius: 6px;
     text-align: center;
+    font-weight: bold;
 }
 
 /* 🚪 Logout Button */
@@ -119,4 +122,19 @@ tr:hover {
 
 .logout-button:hover {
     background: #c82333 !important;
+}
+
+/* List */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Analytics Cards */
+.analytics {
+    display: flex;
+    justify-content: space-between;
+}
+.analytics .card {
+    flex: 1;
 }

@@ -33,6 +33,27 @@ while ($row = mysqli_fetch_assoc($result)) {
     $marks[] = $row['marks'];
     $attendance[] = $row['percentage'];
 }
+
+// Average Marks
+$avgMarksQuery = mysqli_query($conn, "SELECT AVG(marks) as avg_marks FROM marks");
+$avgMarksRow = mysqli_fetch_assoc($avgMarksQuery);
+$avg_marks = round($avgMarksRow['avg_marks'], 2);
+
+// Average Attendance
+$avgAttendanceQuery = mysqli_query($conn, "SELECT AVG(percentage) as avg_attendance FROM attendance");
+$avgAttendanceRow = mysqli_fetch_assoc($avgAttendanceQuery);
+$avg_attendance = round($avgAttendanceRow['avg_attendance'], 2);
+
+//Insight Logic
+if ($avg_marks > 85 && $avg_attendance > 90) {
+    $insight = "Overall performance is excellent! 🌟";
+} elseif ($avg_marks > 70 && $avg_attendance > 80) {
+    $insight = "Performance is good, needs a bit more effort. 👍";
+} elseif ($avg_marks > 50 && $avg_attendance > 60) {
+    $insight = "Performance is moderate, needs improvement. 📈";
+} else {
+    $insight = "Performance is low, immediate attention required. 🚨";
+}
 ?>
 
 <!DOCTYPE html>
@@ -54,9 +75,28 @@ while ($row = mysqli_fetch_assoc($result)) {
         <a href="add_student.php">Add Student</a>
         <a href="add_marks.php">Add Marks</a>
         <a href="add_attendance.php">Add Attendance</a>
+        <a href="predict.php">Predict Performance</a>
         <a href="logout.php" class="logout-button">Logout</a>
     </div>
-    
+
+    <!--Analytics Cards-->
+    <div class="analytics">
+    <div class="card">
+        <h3>Average Marks</h3>
+        <p><?php echo $avg_marks; ?></p>
+    </div>
+
+    <div class="card">
+        <h3>Average Attendance</h3>
+        <p><?php echo $avg_attendance; ?>%</p>
+    </div>
+
+    <div class="card">
+        <h3>Performance Insight</h3>
+        <p><?php echo $insight; ?></p>
+    </div>
+    </div>
+
     <!-- Students -->
     <div class="card">
         <h3>All Students</h3>
@@ -156,6 +196,5 @@ new Chart(document.getElementById('myChart'), {
     }
 });
 </script>
-
 </body>
 </html>

@@ -1,34 +1,78 @@
 <?php
-$output = "";
+include "config.php";
+session_start();
+$res = "";
+$prob = "";
 $error = "";
+
+if (isset($_SESSION['prediction_result'])) {
+    $res = $_SESSION['prediction_result'];
+    $prob = $_SESSION['prediction_prob'];
+    unset($_SESSION['prediction_result']);
+    unset($_SESSION['prediction_prob']);
+}
+
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
 
 if (isset($_POST['predict'])) {
 
     // Sanitize + validate inputs
     $attendance = floatval($_POST['attendance']);
     $marks = floatval($_POST['marks']);
-    $study = floatval($_POST['study']);
+    $study_hours = floatval($_POST['study_hours']);
 
     if ($attendance < 0 || $attendance > 100) {
         $error = "Attendance must be between 0 and 100!";
     } elseif ($marks < 0 || $marks > 100) {
         $error = "Marks must be between 0 and 100!";
-    } elseif ($study < 0) {
+    } elseif ($study_hours < 0) {
         $error = "Study hours must be positive!";
     } else {
 
-        // 🔐 Safe command execution
+        // Safe command execution
         $python = "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python314\\python.exe";
         $script = "C:\\xampp\\htdocs\\acadiq\\predict.py";
 
         $command = 'cmd /c ""' . $python . '" "' . $script . '" '
          . escapeshellarg($attendance) . ' '
          . escapeshellarg($marks) . ' '
-         . escapeshellarg($study) . ' 2>&1"';
+         . escapeshellarg($study_hours) . ' 2>&1"';
         $result = shell_exec($command);
 
         if ($result) {
             $output = trim($result);
+            $parts = explode("|", $output);
+
+        if (count($parts) == 2) {
+         $res = $parts[0];
+         $prob = round($parts[1] * 100, 2);
+
+        // Get logged-in user ID
+        $email = $_SESSION['user'];
+        $user_query = "SELECT id FROM students WHERE email='$email'";
+        $user_result = mysqli_query($conn, $user_query);
+        $user = mysqli_fetch_assoc($user_result);
+        $student_id = $user['id'];
+
+        $insert = "INSERT INTO predictions 
+        (student_id, prediction, attendance, marks, study_hours) 
+        VALUES ('$student_id', '$res', '$attendance', '$marks', '$study_hours')";
+    
+        mysqli_query($conn, $insert);
+
+        // SAVE result for display
+        $_SESSION['prediction_result'] = $res;
+        $_SESSION['prediction_prob'] = $prob;
+
+        // REDIRECT to avoid form resubmission
+        header("Location: predict.php");
+        exit();
+        }   else {
+        echo "<p class='error'>Unexpected output format from Python script.</p>";
+    }
         } else {
             $error = "Prediction failed. Check Python setup.";
         }
@@ -46,28 +90,64 @@ if (isset($_POST['predict'])) {
     <form method="POST">
         <input type="number" name="attendance" placeholder="Attendance (%)" value="<?php if(isset($_POST['attendance'])) echo $_POST['attendance']; ?>" required><br>
         <input type="number" name="marks" placeholder="Marks" value="<?php if(isset($_POST['marks'])) echo $_POST['marks']; ?>" required><br>
-        <input type="number" name="study" placeholder="Study Hours" value="<?php if(isset($_POST['study'])) echo $_POST['study']; ?>" required><br>
+        <input type="number" name="study_hours" placeholder="Study Hours" value="<?php if(isset($_POST['study_hours'])) echo $_POST['study_hours']; ?>" required><br>
         <button name="predict">Predict</button>
     </form>
 
-   <?php
-if (!empty($output)) {
-
-    $parts = explode("|", $output);
-
-    if (count($parts) == 2) {
-        $res = $parts[0];
-        $prob = round($parts[1] * 100, 2);
+    <!-- Display result -->
+    <?php if (!empty($res)) { ?>
+        <?php
+        $color = ($res == 'Pass') ? '#0caa31' : '#d84854';
+        $message = ($res == 'Pass') ? "Great job! Keep it up!" : "Don't worry, focus on improving!";
         ?>
-
         <div class="card">
-            <h3 class="success">Prediction: <?php echo $res; ?></h3>
-            <p>Confidence: <?php echo $prob; ?>%</p>
+            <h2 style="color: <?php echo $color; ?>;"><?php echo $res; ?></h2>
+            <p style="text-align: center;"><strong>Confidence: </strong><?php echo $prob; ?>%</p>
+            <p><?php echo $message; ?></p>
         </div>
 
-        <?php
-    } else {
-        echo "<p class='error'>Unexpected output format from Python script.</p>";
-    }
-}
-?>
+        <div class="card">
+            <h3>💡Suggestions:</h3>
+            <ul>
+                <?php
+                if ($res == 'Pass') {
+                    echo "<li>💪Maintain attendance and marks.</li>";
+                    echo "<li>📚Try to increase study hours for even better results.</li>";
+                    echo "<li>📈Keep practicing regularly!</li>";
+                } else {
+                    echo "<li>🎯Focus on improving attendance.</li>";
+                    echo "<li>📉Review subjects where marks are low.</li>";
+                    echo "<li>📚Consider increasing study hours.</li>";
+                }
+                ?>
+            </ul>
+        </div>
+
+        <!-- History -->
+        <h3 style="background-color: #89dbed;">📊Recent Predictions</h3>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Attendance (%)</th>
+                <th>Marks</th>
+                <th>Study Hours</th>
+                <th>Result</th>
+            </tr>
+            <?php
+            $email = $_SESSION['user'];
+            $query = "SELECT p.prediction, p.created_at, p.attendance, p.marks, p.study_hours FROM predictions p JOIN students s ON p.student_id = s.id WHERE s.email = '$email' ORDER BY p.created_at DESC";
+                $result = mysqli_query($conn, $query);
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>";
+                    echo "<td>" . date("Y-m-d H:i", strtotime($row['created_at'])) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['attendance']) . "%</td>";
+                    echo "<td>" . htmlspecialchars($row['marks']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['study_hours']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['prediction']) . "</td>";
+                }
+            }
+        ?>    
+        </table>
+        <button style="width: 10%;"><a href="dashboard.php">Back to Dashboard</a></button>
+</div>
+

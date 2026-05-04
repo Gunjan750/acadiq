@@ -56,7 +56,7 @@ if (isset($_POST['submit'])) {
 <div class="container">
 
     <h2>Add New Student</h2>
-    <a href="index.php">← Back to Student List</a><br><br>
+    <a href="index.php">Back to Student List</a><br><br>
 
     <?php if ($error) echo "<p class='error'>$error</p>"; ?>
     <?php if ($success) echo "<p class='success'>$success</p>"; ?>
