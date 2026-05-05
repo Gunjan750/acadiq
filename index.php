@@ -15,7 +15,7 @@ $result = mysqli_query($conn, $query);
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AcadIQ - Students</title>
+    <title>AcadIQ - Students Index</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -40,6 +40,8 @@ $result = mysqli_query($conn, $query);
             </tr>
 
             <?php
+            
+            if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>
                         <td>{$row['id']}</td>
@@ -50,6 +52,9 @@ $result = mysqli_query($conn, $query);
                             <a href='delete_student.php?id={$row['id']}' onclick=\"return confirm('Are you sure?')\">Delete</a>
                         </td>
                       </tr>";
+            }
+            } else {
+                echo "<tr><td colspan='3'>No students found.</td></tr>";
             }
             ?>
 

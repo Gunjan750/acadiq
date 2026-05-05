@@ -8,8 +8,8 @@ body {
 
 /* 📦 Container */
 .container {
-    width: 80%;
-    margin: 30px auto;
+    width: 85%;
+    margin: auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 12px;
@@ -55,6 +55,7 @@ button {
     background-color: #28a745;
     color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
     transition: 0.3s;
 }
@@ -78,7 +79,7 @@ button:hover {
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 th {
@@ -96,7 +97,7 @@ tr:hover {
     background-color: #f2f2f2;
 }
 
-/* ✅ Messages */
+/*  Messages */
 .success {
     color: #155724;
     background: #d4edda;
@@ -137,4 +138,11 @@ ul {
 }
 .analytics .card {
     flex: 1;
+}
+.card {
+    margin-top: 20px;
+}
+.card p strong {
+    font-size: 15px;
+    letter-spacing: 0.5px;
 }

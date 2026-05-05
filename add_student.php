@@ -48,7 +48,7 @@ if (isset($_POST['submit'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Student</title>
+    <title>AcadIQ - Add Student</title>
     <link rel="stylesheet" href="style.css">
 </head>
 

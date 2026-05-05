@@ -17,7 +17,7 @@ if (isset($_POST['login'])) {
 
     if ($row = mysqli_fetch_assoc($result)) {
 
-        // Simple password check (upgrade to hashed later if needed)
+        // Simple password check (upgrade to hashing in production!)
         if ($password === $row['password']) {
             $_SESSION['user'] = $row['email'];
             header("Location: dashboard.php");
@@ -31,7 +31,7 @@ if (isset($_POST['login'])) {
     }
 }
 ?>
-
+<title>AcadIQ - Login</title>
 <link rel="stylesheet" href="style.css">
 
 <div class="container">
@@ -44,5 +44,6 @@ if (isset($_POST['login'])) {
         <input type="email" name="email" placeholder="Email" required><br>
         <input type="password" name="password" placeholder="Password" required><br>
         <button type="submit" name="login">Login</button>
+        <p>Don't have an account? <a href="register.php">Register</a></p>
     </form>
 </div>

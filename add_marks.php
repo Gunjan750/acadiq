@@ -40,7 +40,7 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
-
+<title>AcadIQ - Add Marks</title>
 <link rel="stylesheet" href="style.css">
 
 <div class="container">
@@ -56,5 +56,5 @@ if (isset($_POST['submit'])) {
         <button type="submit" name="submit">Add Marks</button>
     </form>
 
-    <br><a href="dashboard.php">← Back to Dashboard</a>
+    <br><button style="width: 25%; align-items: center; "><a href="dashboard.php" style="text-decoration: none;">Back to Dashboard</a></button>
 </div>

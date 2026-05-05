@@ -59,7 +59,7 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>AcadIQ - Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -122,12 +122,15 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
             <tr><th>Student ID</th><th>Subject ID</th><th>Marks</th></tr>
             <?php
             $result = mysqli_query($conn, "SELECT * FROM marks");
+            if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>
                         <td>{$row['student_id']}</td>
                         <td>{$row['subject_id']}</td>
                         <td>{$row['marks']}</td>
                       </tr>";
+            } } else {
+                echo "<tr><td colspan='3'>No marks found.</td></tr>";
             }
             ?>
         </table>
@@ -140,11 +143,14 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
             <tr><th>Student ID</th><th>Attendance (%)</th></tr>
             <?php
             $result = mysqli_query($conn, "SELECT * FROM attendance");
+            if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>
                         <td>{$row['student_id']}</td>
-                        <td>{$row['percentage']}</td>
+                        <td>{$row['percentage']}%</td>
                       </tr>";
+            } } else {
+                echo "<tr><td colspan='2'>No attendance records found.</td></tr>";
             }
             ?>
         </table>
@@ -154,7 +160,7 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
     <div class="card">
         <h3>Performance Overview</h3>
         <table>
-            <tr><th>Name</th><th>Marks</th><th>Attendance</th></tr>
+            <tr><th>Name</th><th>Marks</th><th>Attendance (%)</th></tr>
             <?php
             $query = "SELECT s.name, m.marks, a.percentage 
                       FROM students s
@@ -162,12 +168,15 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
                       JOIN attendance a ON s.id = a.student_id";
             $result = mysqli_query($conn, $query);
 
+            if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>
                         <td>" . htmlspecialchars($row['name']) . "</td>
                         <td>{$row['marks']}</td>
-                        <td>{$row['percentage']}</td>
+                        <td>{$row['percentage']}%</td>
                       </tr>";
+            } } else {
+                echo "<tr><td colspan='3'>No performance data found.</td></tr>";
             }
             ?>
         </table>

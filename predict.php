@@ -4,6 +4,16 @@ session_start();
 $res = "";
 $prob = "";
 $error = "";
+$attendance = "";
+$marks = "";
+$study_hours = "";
+
+// Load from session if available (after redirect)
+if (isset($_SESSION['attendance'])) {
+    $attendance = $_SESSION['attendance'];
+    $marks = $_SESSION['marks'];
+    $study_hours = $_SESSION['study_hours'];
+}
 
 if (isset($_SESSION['prediction_result'])) {
     $res = $_SESSION['prediction_result'];
@@ -23,6 +33,11 @@ if (isset($_POST['predict'])) {
     $attendance = floatval($_POST['attendance']);
     $marks = floatval($_POST['marks']);
     $study_hours = floatval($_POST['study_hours']);
+
+    // Save to session for redisplay after redirect
+    $_SESSION['attendance'] = $attendance;
+    $_SESSION['marks'] = $marks;
+    $_SESSION['study_hours'] = $study_hours;
 
     if ($attendance < 0 || $attendance > 100) {
         $error = "Attendance must be between 0 and 100!";
@@ -79,12 +94,13 @@ if (isset($_POST['predict'])) {
     }
 }
 ?>
-
+<title>AcadIQ - Predict Performance</title>
 <link rel="stylesheet" href="style.css">
 
 <div class="container">
     <h2>🤖 Predict Student Performance</h2>
 
+     <button style="width: 25%; align-items: center; "><a href="dashboard.php" style="text-decoration: none;">Back to Dashboard</a></button>
     <?php if (!empty($error)) echo "<p class='error'>$error</p>"; ?>
 
     <form method="POST">
@@ -99,10 +115,22 @@ if (isset($_POST['predict'])) {
         <?php
         $color = ($res == 'Pass') ? '#0caa31' : '#d84854';
         $message = ($res == 'Pass') ? "Great job! Keep it up!" : "Don't worry, focus on improving!";
+        $colour = ($res == 'Pass') ? '#a2efb4' : '#f7939b';
         ?>
-        <div class="card">
+        <div class="card" style="background-color: <?php echo $colour; ?>;">
             <h2 style="color: <?php echo $color; ?>;"><?php echo $res; ?></h2>
             <p style="text-align: center;"><strong>Confidence: </strong><?php echo $prob; ?>%</p>
+
+            <!--Show current input values-->
+            <p style="text-align: center;">
+                <strong>
+                Attendance: <?php echo $attendance; ?>% |
+                Marks: <?php echo $marks; ?> |
+                Study Hours: <?php echo $study_hours; ?>
+                </strong> 
+            </p>
+
+            <!-- Personalized message -->
             <p><?php echo $message; ?></p>
         </div>
 
@@ -122,8 +150,8 @@ if (isset($_POST['predict'])) {
                 ?>
             </ul>
         </div>
-
-        <!-- History -->
+<?php   } ?>   
+         <!-- History -->
         <h3 style="background-color: #89dbed;">📊Recent Predictions</h3>
         <table>
             <tr>
@@ -135,19 +163,22 @@ if (isset($_POST['predict'])) {
             </tr>
             <?php
             $email = $_SESSION['user'];
-            $query = "SELECT p.prediction, p.created_at, p.attendance, p.marks, p.study_hours FROM predictions p JOIN students s ON p.student_id = s.id WHERE s.email = '$email' ORDER BY p.created_at DESC";
+            $query = "SELECT p.prediction, p.created_at, p.attendance, p.marks, p.study_hours FROM predictions p JOIN students s ON p.student_id = s.id WHERE s.email = '$email' ORDER BY p.created_at DESC LIMIT 5";
                 $result = mysqli_query($conn, $query);
+                if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<tr>";
                     echo "<td>" . date("Y-m-d H:i", strtotime($row['created_at'])) . "</td>";
                     echo "<td>" . htmlspecialchars($row['attendance']) . "%</td>";
                     echo "<td>" . htmlspecialchars($row['marks']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['study_hours']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['prediction']) . "</td>";
+                    $color = ($row['prediction'] == 'Pass') ? '#0caa31' : '#d84854';
+                    echo "<td style='color: $color; font-weight: bold;'>" . htmlspecialchars($row['prediction']) . "</td>";
+                    echo "</tr>";
                 }
-            }
-        ?>    
+            } else {
+                echo "<tr><td colspan='5'>No predictions found.</td></tr>";
+            } ?>  
         </table>
-        <button style="width: 10%;"><a href="dashboard.php">Back to Dashboard</a></button>
 </div>
 
