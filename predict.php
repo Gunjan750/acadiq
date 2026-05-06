@@ -96,7 +96,7 @@ if (isset($_POST['predict'])) {
 ?>
 <title>AcadIQ - Predict Performance</title>
 <link rel="stylesheet" href="style.css">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="container">
     <h2>🤖 Predict Student Performance</h2>
 
@@ -153,11 +153,12 @@ if (isset($_POST['predict'])) {
 <?php   } ?>   
          <!-- History -->
         <h3 style="background-color: #89dbed;">📊Recent Predictions</h3>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Attendance (%)</th>
-                <th>Marks</th>
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Attendance (%)</th>
+                    <th>Marks</th>
                 <th>Study Hours</th>
                 <th>Result</th>
             </tr>

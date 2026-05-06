@@ -40,6 +40,7 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AcadIQ - Add Marks</title>
 <link rel="stylesheet" href="style.css">
 

@@ -31,6 +31,8 @@ if(isset($_POST['register'])) {
 
             if(mysqli_query($conn, $query)) {
                 $success = "Registration successful! Please login.";
+                header("Location: login.php");
+                exit();
             } else {
                 $error = "Something went wrong!";
             }
@@ -41,6 +43,7 @@ if(isset($_POST['register'])) {
 
 <title>AcadIQ - Register</title>
 <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <div class="container">
     <h2>📝 Register</h2>

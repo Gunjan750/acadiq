@@ -17,6 +17,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <title>AcadIQ - Students Index</title>
     <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
@@ -31,11 +32,12 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <div class="card">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
                 <th>Action</th>
             </tr>
 
