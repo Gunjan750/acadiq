@@ -167,22 +167,30 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
         <h3>Marks</h3>
         <div class="table-container">
             <table>
-                <tr><th>Student ID</th><th>Subject ID</th><th>Marks</th></tr>
+                <?php if ($role == 'admin') { ?>
+                    <tr><th>Student ID</th><th>Student Name</th> <?php } ?>
+                    <th>Subject ID</th><th>Subject Name</th><th>Marks</th></tr>
                 <?php
-                if ($role == 'admin') {
-                $result = mysqli_query($conn, "SELECT * FROM marks ORDER BY student_id ASC");
-                } else {
-                    $result = mysqli_query($conn, "SELECT * FROM marks WHERE student_id = $student_id ORDER BY subject_id ASC");
-                }
+            if ($role == 'admin') {
+                $result = mysqli_query($conn, "SELECT m.student_id, students.name, m.subject_id, s.subject_name, m.marks 
+                FROM marks m JOIN subjects s ON m.subject_id = s.id JOIN students ON m.student_id = students.id ORDER BY m.student_id ASC");
+            } else {
+                 $result = mysqli_query($conn, "SELECT m.subject_id, s.subject_name, m.marks
+                    FROM marks m JOIN subjects s ON m.subject_id = s.id WHERE m.student_id = $student_id ORDER BY m.subject_id ASC");
+            }
                 if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<tr>
-                            <td>{$row['student_id']}</td>
-                            <td>{$row['subject_id']}</td>
-                        <td>{$row['marks']}</td>
+                    echo "<tr>";
+                    if ($role == 'admin') {
+                    echo "<td>{$row['student_id']}</td>  
+                          <td>{$row['name']}</td>";
+                    }
+                    echo "<td>{$row['subject_id']}</td>
+                            <td>{$row['subject_name']}</td>
+                            <td>{$row['marks']}</td>
                       </tr>";
             } } else {
-                echo "<tr><td colspan='3'>No marks found.</td></tr>";
+                echo "<tr><td colspan='4'>No marks found.</td></tr>";
             }
             ?>
         </table>
@@ -193,22 +201,44 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
         <h3>Attendance</h3>
         <div class="table-container">
             <table>
-                <tr><th>Student ID</th><th>Attendance (%)</th></tr>
-                <?php
-                if ($role == 'admin') {
-                    $result = mysqli_query($conn, "SELECT * FROM attendance ORDER BY student_id ASC");
-                } else {
-                    $result = mysqli_query($conn, "SELECT * FROM attendance WHERE student_id = $student_id ORDER BY subject_id ASC");
-                }
-                if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>
-                        <td>{$row['student_id']}</td>
-                        <td>{$row['percentage']}%</td>
-                      </tr>";
-            } } else {
-                echo "<tr><td colspan='2'>No attendance records found.</td></tr>";
+                <?php if ($role == 'admin') { ?>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                <?php } ?>
+                <th>Subject ID</th>
+                <th>Subject Name</th>
+                <th>Attendance (%)</th>
+            </tr>
+            <?php
+            if ($role == 'admin') {
+                $result = mysqli_query($conn, "SELECT a.student_id, students.name, a.subject_id, s.subject_name, a.percentage
+                    FROM attendance a JOIN subjects s ON a.subject_id = s.id JOIN students ON a.student_id = students.id ORDER BY a.student_id ASC
+                ");
+            } else {
+                $result = mysqli_query($conn, "SELECT a.subject_id, s.subject_name, a.percentage
+                    FROM attendance a JOIN subjects s ON a.subject_id = s.id WHERE a.student_id = $student_id ORDER BY a.subject_id ASC");
             }
+            if (mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>";
+                    if ($role == 'admin') {
+                        echo "<td>{$row['student_id']}</td>";
+                        echo "<td>{$row['name']}</td>";
+                    }
+                    echo "
+                        <td>{$row['subject_id']}</td>
+                        <td>{$row['subject_name']}</td>
+                        <td>{$row['percentage']}%</td>
+                    ";
+                    echo "</tr>";
+                }
+            } else {
+                $colspan = ($role == 'admin') ? 5 : 3;
+                echo "<tr>
+                        <td colspan='$colspan'>No attendance records found.</td>
+                      </tr>";
+            }
+
             ?>
         </table>
     </div>
@@ -219,35 +249,46 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
         <h3>Performance Overview</h3>
         <div class="table-container">
             <table>
-                <tr><th>Name</th><th>Marks</th><th>Attendance (%)</th></tr>
+                <?php if ($role == 'admin') { ?><tr><th>Student Name</th><?php } ?>
+                <th>Subject Name</th><th>Marks</th><th>Attendance (%)</th></tr>
                 <?php
-                if ($role == 'admin') {
-                    $query = "SELECT s.name, m.marks, a.percentage 
-                              FROM students s
-                              JOIN marks m ON s.id = m.student_id
-                              JOIN attendance a ON s.id = a.student_id
-                              WHERE role = 'student'
-                              ORDER BY s.id ASC";
-                } else {
-                    $query = "SELECT s.name, m.marks, a.percentage 
-                              FROM students s
-                              JOIN marks m ON s.id = m.student_id
-                              JOIN attendance a ON s.id = a.student_id
-                              WHERE s.id = $student_id
-                              ORDER BY m.subject_id ASC";
-                }
-                $result = mysqli_query($conn, $query);
-
+            if ($role == 'admin') {
+                $query = "SELECT s.name, subject.subject_name, m.marks, a.percentage
+                    FROM students s JOIN marks m ON s.id = m.student_id
+                    JOIN attendance a ON s.id = a.student_id AND m.subject_id = a.subject_id
+                    JOIN subjects subject ON m.subject_id = subject.id WHERE s.role = 'student' ORDER BY s.id ASC";
+            } else {
+                $query = "SELECT subject.subject_name, m.marks, a.percentage
+                    FROM students s JOIN marks m ON s.id = m.student_id
+                    JOIN attendance a ON s.id = a.student_id AND m.subject_id = a.subject_id
+                    JOIN subjects subject ON m.subject_id = subject.id
+                    WHERE s.id = $student_id ORDER BY m.subject_id ASC";
+            }
+        $result = mysqli_query($conn, $query);
             if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>
-                        <td>" . htmlspecialchars($row['name']) . "</td>
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>";
+                    if ($role == 'admin') {
+                        echo "<td>" . htmlspecialchars($row['name']) . "</td>";
+                    }
+                    echo "
+                        <td>" . htmlspecialchars($row['subject_name']) . "</td>
                         <td>{$row['marks']}</td>
                         <td>{$row['percentage']}%</td>
-                      </tr>";
-            } } else {
-                echo "<tr><td colspan='3'>No performance data found.</td></tr>";
+                    ";
+                    echo "</tr>";
+                }
+            } else {
+                $colspan = ($role == 'admin') ? 4 : 3;
+                echo "
+                    <tr>
+                        <td colspan='$colspan'>
+                            No performance data found.
+                        </td>
+                    </tr>
+                ";
             }
+
             ?>
         </table>
     </div>

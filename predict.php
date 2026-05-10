@@ -113,9 +113,9 @@ if (isset($_POST['predict'])) {
     <!-- Display result -->
     <?php if (!empty($res)) { ?>
         <?php
-        $color = ($res == 'Pass') ? '#0caa31' : '#d84854';
+        $color = ($res == 'Pass') ? '#39bd58' : '#ed5f6b';
         $message = ($res == 'Pass') ? "Great job! Keep it up!" : "Don't worry, focus on improving!";
-        $colour = ($res == 'Pass') ? '#a2efb4' : '#f7939b';
+        $colour = ($res == 'Pass') ? '#7bd590' : '#f7939b';
         ?>
         <div class="card" style="background-color: <?php echo $colour; ?>;">
             <h2 style="color: <?php echo $color; ?>;"><?php echo $res; ?></h2>

@@ -7,6 +7,7 @@ $success = "";
 if (isset($_POST['submit'])) {
 
     $student_id = intval($_POST['student_id']);
+    $subject_id = intval($_POST['subject_id']);
     $percentage = floatval($_POST['percentage']);
 
     // Validation
@@ -26,9 +27,18 @@ if (isset($_POST['submit'])) {
             $error = "Student does not exist!";
         } else {
 
-            // Insert attendance
-            $stmt = mysqli_prepare($conn, "INSERT INTO attendance (student_id, percentage) VALUES (?, ?)");
-            mysqli_stmt_bind_param($stmt, "id", $student_id, $percentage);
+            // Check if subject exists
+            $stmt = mysqli_prepare($conn, "SELECT id FROM subjects WHERE id=?");
+            mysqli_stmt_bind_param($stmt, "i", $subject_id);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_store_result($stmt);
+
+            if (mysqli_stmt_num_rows($stmt) == 0) {
+                $error = "Subject does not exist!";
+            } else {
+                // Insert attendance
+                $stmt = mysqli_prepare($conn, "INSERT INTO attendance (student_id, subject_id, percentage) VALUES (?, ?, ?)");
+                mysqli_stmt_bind_param($stmt, "iid", $student_id, $subject_id, $percentage);
 
             if (mysqli_stmt_execute($stmt)) {
                 $success = "Attendance added successfully!";
@@ -37,6 +47,7 @@ if (isset($_POST['submit'])) {
             }
         }
     }
+}
 }
 ?>
 
@@ -52,6 +63,7 @@ if (isset($_POST['submit'])) {
 
     <form method="POST">
         <input type="number" name="student_id" placeholder="Student ID" required><br><br>
+        <input type="number" name="subject_id" placeholder="Subject ID" required><br><br>
         <input type="number" name="percentage" placeholder="Attendance (%)" min="0" max="100" step="0.1" required><br><br>
         <button type="submit" name="submit">Add Attendance</button>
     </form>
