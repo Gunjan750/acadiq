@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$query = "SELECT * FROM students";
+$query = "SELECT * FROM students WHERE role!='admin'";
 $result = mysqli_query($conn, $query);
 ?>
 
