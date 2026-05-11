@@ -56,7 +56,7 @@ if(isset($_POST['register'])) {
         <input type="email" name="email" placeholder="Email" required><br>
         <input type="password" name="password" placeholder="Password" required><br>
 
-        <button name="register">Register</button>
+        <button name="register">Register</button><br><br>
     </form>
 
     <p>Already have an account? <a href="login.php">Login</a></p>

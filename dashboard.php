@@ -131,7 +131,7 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
 
     <div class="card">
         <h3>Performance Insight</h3>
-        <p><?php echo $insight; ?></p>
+        <p style="font-size: large;"><?php echo $insight; ?></p>
     </div>
     </div>
 
@@ -292,14 +292,13 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
             ?>
         </table>
     </div>
+    </div>
 
     <!-- Chart -->
     <div class="card">
         <h3>Performance Graph</h3>
         <canvas id="myChart"></canvas>
     </div>
-
-</div>
 
 <script>
 const labels = <?php echo json_encode($labels); ?>;
