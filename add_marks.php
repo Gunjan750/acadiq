@@ -64,5 +64,5 @@ if (isset($_POST['submit'])) {
         <button type="submit" name="submit">Add Marks</button>
     </form>
 
-    <br><button style="width: 25%; align-items: center; "><a href="dashboard.php" style="text-decoration: none;">Back to Dashboard</a></button>
+    <br><button style="width: 25%; align-items: center; "><a href="dashboard.php" style="text-decoration: none; color: white;">Back to Dashboard</a></button>
 </div>
