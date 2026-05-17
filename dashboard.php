@@ -101,8 +101,13 @@ if ($avg_marks > 85 && $avg_attendance > 90) {
 </head>
 
 <body>
+    <div class="brand">
+    <h1 class="logo-text">AcadIQ</h1>
+    <p class="tagline">
+        AI-Powered Student Performance Analysis & Prediction System
+    </p>
+</div>
 <div class="container">
-
     <h2>Welcome, <?php echo htmlspecialchars($user['name']); ?> 👋</h2>
     <p>Email: <?php echo htmlspecialchars($user['email']); ?></p>
 

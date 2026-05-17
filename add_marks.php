@@ -44,6 +44,13 @@ if (isset($_POST['submit'])) {
 <title>AcadIQ - Add Marks</title>
 <link rel="stylesheet" href="style.css">
 
+<div class="brand">
+    <h1 class="logo-text">AcadIQ</h1>
+    <p class="tagline">
+        AI-Powered Student Performance Analysis & Prediction System
+    </p>
+</div>
+
 <div class="container">
     <h2>Add Marks</h2>
 

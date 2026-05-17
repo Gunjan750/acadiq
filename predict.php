@@ -97,17 +97,23 @@ if (isset($_POST['predict'])) {
 <title>AcadIQ - Predict Performance</title>
 <link rel="stylesheet" href="style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="brand">
+    <h1 class="logo-text">AcadIQ</h1>
+    <p class="tagline">
+        AI-Powered Student Performance Analysis & Prediction System
+    </p>
+</div>
 <div class="container">
     <h2>🤖 Predict Student Performance</h2>
 
-     <button style="width: 25%; align-items: center; "><a href="dashboard.php" style="text-decoration: none;">Back to Dashboard</a></button>
+     <button style="width: 25%; align-items: center; "><a href="dashboard.php" style="text-decoration: none; color: white;">Back to Dashboard</a></button>
     <?php if (!empty($error)) echo "<p class='error'>$error</p>"; ?>
 
     <form method="POST">
         <input type="number" name="attendance" placeholder="Attendance (%)" value="<?php if(isset($_POST['attendance'])) echo $_POST['attendance']; ?>" required><br>
         <input type="number" name="marks" placeholder="Marks" value="<?php if(isset($_POST['marks'])) echo $_POST['marks']; ?>" required><br>
         <input type="number" name="study_hours" placeholder="Study Hours" value="<?php if(isset($_POST['study_hours'])) echo $_POST['study_hours']; ?>" required><br>
-        <button name="predict">Predict</button>
+        <button name="predict">Predict</button><br><br>
     </form>
 
     <!-- Display result -->

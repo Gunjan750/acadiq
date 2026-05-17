@@ -36,6 +36,12 @@ if (isset($_POST['login'])) {
 <link rel="stylesheet" href="style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<div class="brand">
+    <h1 class="logo-text">AcadIQ</h1>
+    <p class="tagline">
+        AI-Powered Student Performance Analysis & Prediction System
+    </p>
+</div>
 <div class="container">
     <h2>Login</h2>
 

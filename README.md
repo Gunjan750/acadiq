@@ -90,7 +90,7 @@ Future Enhancements
 * Email notifications
 * Export reports (PDF/Excel)
 * Advanced search and filtering
-* Mobile responsive dashboard
+* Mobile responsive system
 
 ---
 
