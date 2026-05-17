@@ -138,6 +138,7 @@ button:hover {
     transition: 0.3s ease;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
 }
 .card:hover {
     transform: translateY(-5px);
