@@ -119,11 +119,15 @@ if (isset($_POST['predict'])) {
     <!-- Display result -->
     <?php if (!empty($res)) { ?>
         <?php
-        $color = ($res == 'Pass') ? '#39bd58' : '#ed5f6b';
+        $color = ($res == 'Pass') ? '#166534' : '#991b1b';
         $message = ($res == 'Pass') ? "Great job! Keep it up!" : "Don't worry, focus on improving!";
-        $colour = ($res == 'Pass') ? '#7bd590' : '#f7939b';
+        $colour = ($res == 'Pass') ? '#dcfce7' : '#fee2e2';
+        $color1 = ($res == 'Pass') ?'#1e3a8a' : '#5b21b6';
+        $border1 = ($res == 'Pass') ? '#f5eaf6' : '#fac4e5';
+        $border = ($res == 'Pass') ? '6px solid #22c55e' : '6px solid #d84854';
+    
         ?>
-        <div class="card" style="background-color: <?php echo $colour; ?>;">
+        <div class="card" style="background-color: <?php echo $colour; ?>; border: <?php echo $border; ?>;">
             <h2 style="color: <?php echo $color; ?>;"><?php echo $res; ?></h2>
             <p style="text-align: center;"><strong>Confidence: </strong><?php echo $prob; ?>%</p>
 
@@ -140,8 +144,8 @@ if (isset($_POST['predict'])) {
             <p><?php echo $message; ?></p>
         </div>
 
-        <div class="card">
-            <h3>💡Suggestions:</h3>
+        <div class="card" style="background-color: <?php echo $border1; ?>;">
+            <h3 style="color: <?php echo $color1; ?>;">💡Suggestions:</h3>
             <ul>
                 <?php
                 if ($res == 'Pass') {
