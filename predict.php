@@ -123,7 +123,7 @@ if (isset($_POST['predict'])) {
         $message = ($res == 'Pass') ? "Great job! Keep it up!" : "Don't worry, focus on improving!";
         $colour = ($res == 'Pass') ? '#dcfce7' : '#fee2e2';
         $color1 = ($res == 'Pass') ?'#1e3a8a' : '#5b21b6';
-        $border1 = ($res == 'Pass') ? '#f5eaf6' : '#fac4e5';
+        $border1 = ($res == 'Pass') ? '#dbeafe' : '#fac4e5';
         $border = ($res == 'Pass') ? '6px solid #22c55e' : '6px solid #d84854';
     
         ?>
